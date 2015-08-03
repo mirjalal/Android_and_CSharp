@@ -13,13 +13,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static android.widget.Toast.LENGTH_LONG;
+
 public class User extends AppCompatActivity {
 
     EditText username, password, name, surname, graduated_from, graduated_in, born_place;
-    String _username, _password, _name, _surname, _graduated_from, _graduated_in, _born_place, _birthday;
+    String _username = "", _password = "", _name = "", _surname = "", _graduated_from = "", _graduated_in = "", _born_place = "", _birthday = "";
     TextView birthday;
     Button register;
-    int id = 0;
+    int _id;
     private DBHelper dbHelper;
 
     @Override
@@ -41,7 +43,7 @@ public class User extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            int _id = extras.getInt("id");
+            _id = extras.getInt("id");
 
             if (_id > 0) {
                 //means this is the view part not the add contact part.
@@ -61,7 +63,7 @@ public class User extends AppCompatActivity {
                 if (!cursor.isClosed())
                     cursor.close();
 
-                register.setVisibility(View.INVISIBLE);
+                register.setText("Update");
 
                 username.setText(_username);
                 username.setFocusable(true);
@@ -97,6 +99,45 @@ public class User extends AppCompatActivity {
                 birthday.setText(_birthday);
                 birthday.setFocusable(true);
                 birthday.setClickable(true);
+            } else {
+                Toast.makeText(getApplicationContext(), "This user is not exists. Before login please create it.", LENGTH_LONG).show();
+
+                register.setText("Register");
+
+                username.setText(_username);
+//                username.setFocusable(true);
+//                username.setClickable(true);
+//                username.setEnabled(false);
+
+                password.setText(_password);
+//                password.setFocusable(true);
+//                password.setClickable(true);
+//                password.setEnabled(false);
+//                password.setTransformationMethod(new PasswordTransformationMethod()); // you can show password characters with this method.
+
+                name.setText(_name);
+//                name.setFocusable(true);
+//                name.setClickable(true);
+
+                surname.setText(_surname);
+//                surname.setFocusable(true);
+//                surname.setClickable(true);
+
+                graduated_from.setText(_graduated_from);
+//                graduated_from.setFocusable(true);
+//                graduated_from.setClickable(true);
+
+                graduated_in.setText(_graduated_in);
+//                graduated_in.setFocusable(true);
+//                graduated_in.setClickable(true);
+
+                born_place.setText(_born_place);
+//                born_place.setFocusable(true);
+//                born_place.setClickable(true);
+
+                birthday.setText(_birthday);
+//                birthday.setFocusable(true);
+//                birthday.setClickable(true);
             }
         }
 
@@ -117,28 +158,28 @@ public class User extends AppCompatActivity {
                             _birthday = birthday.getText().toString();
 
                         if (username.getText().toString().equals("") || password.getText().toString().equals(""))
-                            Toast.makeText(getApplicationContext(), "Username and password required.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Username and password required.", LENGTH_LONG).show();
                         else {
                             _username = username.getText().toString().trim();
                             _password = password.getText().toString(); // don't trim this value; user should be enter whitespace
 
                             Bundle extras = getIntent().getExtras();
                             if (extras != null) {
-                                int Value = extras.getInt("id");
+                                _id = extras.getInt("id");
 
-                                if (Value > 0) {
-                                    if (dbHelper.update(id, _username, _password, _name, _surname, _graduated_from, _graduated_in, _born_place, _birthday)) {
+                                if (_id > 0) {
+                                    if (dbHelper.update(_id, _username, _password, _name, _surname, _graduated_from, _graduated_in, _born_place, _birthday)) {
                                         Toast.makeText(getApplicationContext(), "Updated", Toast.LENGTH_SHORT).show();
                                         Intent intent = new Intent(getApplicationContext(), AccountOperations.class);
                                         startActivity(intent);
                                     } else {
-                                        Toast.makeText(getApplicationContext(), "not Updated", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Not updated", Toast.LENGTH_SHORT).show();
                                     }
                                 } else {
                                     if (dbHelper.register(_username, _password, _name, _surname, _graduated_from, _graduated_in, _born_place, _birthday)) {
-                                        Toast.makeText(getApplicationContext(), "done", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_SHORT).show();
                                     } else {
-                                        Toast.makeText(getApplicationContext(), "not done", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getApplicationContext(), "Not done", Toast.LENGTH_SHORT).show();
                                     }
                                     Intent intent = new Intent(getApplicationContext(), AccountOperations.class);
                                     startActivity(intent);

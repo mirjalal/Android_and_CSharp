@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DatabaseOperations));
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.export = new System.Windows.Forms.Button();
             this.import = new System.Windows.Forms.Button();
@@ -41,7 +42,7 @@
             // 
             this.export.Location = new System.Drawing.Point(12, 11);
             this.export.Name = "export";
-            this.export.Size = new System.Drawing.Size(75, 23);
+            this.export.Size = new System.Drawing.Size(114, 41);
             this.export.TabIndex = 0;
             this.export.Text = "Export";
             this.export.UseVisualStyleBackColor = true;
@@ -49,9 +50,9 @@
             // 
             // import
             // 
-            this.import.Location = new System.Drawing.Point(103, 12);
+            this.import.Location = new System.Drawing.Point(169, 12);
             this.import.Name = "import";
-            this.import.Size = new System.Drawing.Size(75, 23);
+            this.import.Size = new System.Drawing.Size(113, 40);
             this.import.TabIndex = 1;
             this.import.Text = "Import";
             this.import.UseVisualStyleBackColor = true;
@@ -61,16 +62,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(190, 46);
+            this.ClientSize = new System.Drawing.Size(294, 64);
             this.Controls.Add(this.import);
             this.Controls.Add(this.export);
             this.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel, ((byte)(0)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "DatabaseOperations";
-            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Database Operations";
             this.ResumeLayout(false);

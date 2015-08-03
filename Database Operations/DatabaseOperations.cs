@@ -12,7 +12,7 @@ namespace Database_Operations
 {
     public partial class DatabaseOperations : Form
     {
-        MySqlConnection conn = new MySqlConnection(@"server=localhost;uid=root;password=connection;database=db_webservice;");
+        MySqlConnection conn = new MySqlConnection(@"server=45.35.4.29;uid=root;password=connection;database=db_webservice;");
 
 
         public DatabaseOperations()
@@ -73,7 +73,7 @@ namespace Database_Operations
                         if ((myStream = import.OpenFile()) != null)
                         {
                             string json = File.ReadAllText(import.FileName);
-                            string reconfigured_json = json.Replace('"', '\'');
+                            //string reconfigured_json = json.Replace('"', '\''); // why I wrote this line? shit...
 
                             List<int> _id = new List<int>();
                             List<string> _username = new List<string>();
@@ -125,7 +125,7 @@ namespace Database_Operations
                                 insert.ExecuteNonQuery();
                             }
 
-                            // clean-up
+                            // clean-up part
                             _id.Clear();
                             _id.TrimExcess();
                             _username.Clear();

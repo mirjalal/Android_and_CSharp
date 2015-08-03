@@ -27,4 +27,5 @@
     <string name="add_new">Add new</string>
     <string name="title_activity_display_user">DisplayUser</string>
     <string name="export">Export</string>
+    <string name="importdb">Import</string>
 </resources>

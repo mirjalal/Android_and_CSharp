@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,9 +17,11 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,7 +31,8 @@ import static android.widget.Toast.LENGTH_LONG;
 
 public class AccountOperations extends AppCompatActivity {
 
-    Button register, updateInfo, export;
+    Button register, updateInfo, export, importdb;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class AccountOperations extends AppCompatActivity {
         register = (Button) findViewById(R.id.register);
         updateInfo = (Button) findViewById(R.id.updateInfo);
         export = (Button) findViewById(R.id.export);
+        importdb = (Button) findViewById(R.id.importdb);
 
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
@@ -54,42 +57,21 @@ public class AccountOperations extends AppCompatActivity {
                         startActivity(new Intent(AccountOperations.this, Login.class));
                         break;
                     case R.id.export:
-//                        try {
-//                            File sd = new File("/storage/extSdCard/Sounds"); //Environment.getExternalStorageDirectory();
-//                            File data = Environment.getDataDirectory();
-//
-//                            if (sd.canWrite()) {
-//                                String currentDBPath = "//data//accountoperations.clientsqliteversion//databases//users.db";
-//                                String backupDBPath = "users_bkp.db";
-//                                File currentDB = new File(data, currentDBPath);
-//                                File backupDB = new File(sd, backupDBPath);
-//
-//                                if (currentDB.exists()) {
-//                                    FileChannel src = new FileInputStream(currentDB).getChannel();
-//                                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-//                                    dst.transferFrom(src, 0, src.size());
-//                                    src.close();
-//                                    dst.close();
-//                                }
-//                                Toast.makeText(getApplicationContext(), "Exported!", Toast.LENGTH_LONG).show();
-//                            }
-//                            else
-//                                Toast.makeText(getApplicationContext(), "Couldn't write.", Toast.LENGTH_LONG).show();
-//                        } catch (Exception e) {
-//                            Log.e("Export error: ", e.toString());
-//                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
-//                        }
-
-//                        TextView t = (TextView) findViewById(R.id.textView);
-//                        t.setText(getResults().toString());
-
-                        File targetLocation = new File(getApplicationContext().getDatabasePath("users.db").getPath());
-                        if (!targetLocation.exists()) {
-                            Toast.makeText(getApplicationContext(), "No entries found in database.", LENGTH_LONG).show();
-                        } else {
+                        File export_db_file = new File(getApplicationContext().getDatabasePath("users.db").getPath());
+                        if (export_db_file.exists()) {
                             export_db(getResults().toString());
+                        } else {
+                            Toast.makeText(getApplicationContext(), "No entries found in database.", LENGTH_LONG).show();
                         }
 
+                        break;
+                    case R.id.importdb:
+                        File import_db_file = new File("/storage/emulated/0/Account operations(SQLite version)/database.im");
+                        if (import_db_file.exists()) {
+                            import_db();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Required file's not found.", LENGTH_LONG).show();
+                        }
                         break;
                 }
             }
@@ -98,19 +80,84 @@ public class AccountOperations extends AppCompatActivity {
         register.setOnClickListener(clickListener);
         updateInfo.setOnClickListener(clickListener);
         export.setOnClickListener(clickListener);
+        importdb.setOnClickListener(clickListener);
     }
 
-    public void copyDirectory(File sourceLocation , File targetLocation) throws IOException {
+
+    private void export_db(String data) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput("database.im", Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+
+            copyFile(new File(getApplicationContext().getFilesDir().getPath()), new File("/storage/emulated/0/Account operations(SQLite version)"));
+            Toast.makeText(getApplicationContext(), "Database exported to: /storage/emulated/0/Account operations(SQLite version) directory.", LENGTH_LONG).show();
+        } catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+            Toast.makeText(getApplicationContext(), "", LENGTH_LONG).show();
+        }
+    }
+
+
+    private void import_db() {
+        try {
+            File filesDir = new File(getApplicationContext().getFilesDir().getPath());
+            if (filesDir.exists()){
+                copyFile(new File("/storage/emulated/0/Account operations(SQLite version)"), new File(getApplicationContext().getFilesDir().getPath()));
+            }
+            else {
+                filesDir.mkdirs();
+                copyFile(new File("/storage/emulated/0/Account operations(SQLite version)"), new File(getApplicationContext().getFilesDir().getPath()));
+            }
+
+            import_data();
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), "Error occured.", LENGTH_LONG).show();
+        }
+    }
+
+
+    private void import_data() {
+        File file = new File(getApplicationContext().getFilesDir().getPath(), "database.im");
+        StringBuilder text = new StringBuilder();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+            }
+            br.close();
+
+//            Toast.makeText(getApplicationContext(), String.valueOf(text), LENGTH_LONG).show();
+
+            if (Integer.valueOf(String.valueOf(text.length())) == 0) {
+                Toast.makeText(getApplicationContext(), "Nothing found to import.", LENGTH_LONG).show();
+            } else {
+                DBHelper helper = new DBHelper(this);
+                if(helper.onUpdate(String.valueOf(text))){
+                    Toast.makeText(getApplicationContext(), "Database updated.", LENGTH_LONG).show();
+                }
+            }
+        }
+        catch (Exception e) {
+            // We'll need to add proper error handling here
+            Log.wtf("EXCEPTION: ", e.toString());
+        }
+    }
+
+
+    public void copyFile(File sourceLocation, File targetLocation) throws IOException {
         if (sourceLocation.isDirectory()) {
             if (!targetLocation.exists() && !targetLocation.mkdirs())
                 Toast.makeText(getApplicationContext(), "Cannot create directory.", LENGTH_LONG).show();
 
             String[] children = sourceLocation.list();
             for (String aChildren : children) {
-                copyDirectory(new File(sourceLocation, aChildren),
+                copyFile(new File(sourceLocation, aChildren),
                         new File(targetLocation, aChildren));
             }
-            Toast.makeText(getApplicationContext(), "Database exported to: " + targetLocation.toString() + "/export.im", LENGTH_LONG).show();
         } else {
             // make sure the directory we plan to store the recording in exists
             File directory = targetLocation.getParentFile();
@@ -131,26 +178,12 @@ public class AccountOperations extends AppCompatActivity {
         }
     }
 
-    private void export_db(String data) {
-        try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput("export.im", Context.MODE_PRIVATE));
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
-
-            copyDirectory(new File(getApplicationContext().getFilesDir().getPath()), new File("/storage/emulated/0/Account operations(SQLite version)"));
-        }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-            Toast.makeText(getApplicationContext(), "", LENGTH_LONG).show();
-        }
-    }
 
     private JSONArray getResults() {
         String dbPath = getApplicationContext().getDatabasePath("users.db").getPath();// Set path to your database
-        String tableName = "users";//Set name of your table
+        String tableName = "users"; //Set name of your table
 
         SQLiteDatabase myDataBase = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-
         String searchQuery = "SELECT _username, _password, _name, _surname, _graduated_from, _graduated_in, _born_place, _birthday FROM " + tableName;
         Cursor cursor = myDataBase.rawQuery(searchQuery, null);
 
@@ -158,7 +191,6 @@ public class AccountOperations extends AppCompatActivity {
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-
             int totalColumn = cursor.getColumnCount();
             JSONObject rowObject = new JSONObject();
 
@@ -185,6 +217,7 @@ public class AccountOperations extends AppCompatActivity {
         return resultSet;
     }
 
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -200,6 +233,7 @@ public class AccountOperations extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+
     @Override
     public void onBackPressed() {
         // This will be called either automatically for you on 2.0
@@ -208,12 +242,14 @@ public class AccountOperations extends AppCompatActivity {
 //        return true;
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_account_operations, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
