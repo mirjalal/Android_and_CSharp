@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +47,6 @@ public class User extends AppCompatActivity {
             if (_id > 0) {
                 //means this is the view part not the add contact part.
                 Cursor cursor = dbHelper.getData(_id);
-            //    id_To_Update = Value;
                 cursor.moveToFirst();
 
                 String _username = cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_USERNAME));
@@ -63,7 +61,7 @@ public class User extends AppCompatActivity {
                 if (!cursor.isClosed())
                     cursor.close();
 
-                register.setText("Update");
+                register.setText(R.string.update);
 
                 username.setText(_username);
                 username.setFocusable(true);
@@ -99,45 +97,28 @@ public class User extends AppCompatActivity {
                 birthday.setText(_birthday);
                 birthday.setFocusable(true);
                 birthday.setClickable(true);
-            } else {
+            } else if (_id == 0) {
                 Toast.makeText(getApplicationContext(), "This user is not exists. Before login please create it.", LENGTH_LONG).show();
 
-                register.setText("Register");
-
+                register.setText(R.string.register);
                 username.setText(_username);
-//                username.setFocusable(true);
-//                username.setClickable(true);
-//                username.setEnabled(false);
-
                 password.setText(_password);
-//                password.setFocusable(true);
-//                password.setClickable(true);
-//                password.setEnabled(false);
-//                password.setTransformationMethod(new PasswordTransformationMethod()); // you can show password characters with this method.
-
                 name.setText(_name);
-//                name.setFocusable(true);
-//                name.setClickable(true);
-
                 surname.setText(_surname);
-//                surname.setFocusable(true);
-//                surname.setClickable(true);
-
                 graduated_from.setText(_graduated_from);
-//                graduated_from.setFocusable(true);
-//                graduated_from.setClickable(true);
-
                 graduated_in.setText(_graduated_in);
-//                graduated_in.setFocusable(true);
-//                graduated_in.setClickable(true);
-
                 born_place.setText(_born_place);
-//                born_place.setFocusable(true);
-//                born_place.setClickable(true);
-
                 birthday.setText(_birthday);
-//                birthday.setFocusable(true);
-//                birthday.setClickable(true);
+            } else {
+                register.setText(R.string.register);
+                username.setText(_username);
+                password.setText(_password);
+                name.setText(_name);
+                surname.setText(_surname);
+                graduated_from.setText(_graduated_from);
+                graduated_in.setText(_graduated_in);
+                born_place.setText(_born_place);
+                birthday.setText(_birthday);
             }
         }
 

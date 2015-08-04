@@ -39,6 +39,14 @@ public class AccountOperations extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_operations);
 
+        File filesDir = new File("/storage/emulated/0/Account operations(SQLite version)");
+        if (!filesDir.exists()){
+            filesDir.mkdirs();
+        } else {
+            filesDir.delete();
+            filesDir.mkdirs();
+        }
+
         register = (Button) findViewById(R.id.register);
         updateInfo = (Button) findViewById(R.id.updateInfo);
         export = (Button) findViewById(R.id.export);
@@ -50,7 +58,7 @@ public class AccountOperations extends AppCompatActivity {
                 switch (v.getId()) {
                     case R.id.register:
                         Intent intent = new Intent(getApplicationContext(), User.class);
-                        intent.putExtra("id", 0);
+                        intent.putExtra("id", -1);
                         startActivity(intent);
                         break;
                     case R.id.updateInfo:
@@ -63,10 +71,9 @@ public class AccountOperations extends AppCompatActivity {
                         } else {
                             Toast.makeText(getApplicationContext(), "No entries found in database.", LENGTH_LONG).show();
                         }
-
                         break;
                     case R.id.importdb:
-                        File import_db_file = new File("/storage/emulated/0/Account operations(SQLite version)/database.im");
+                        File import_db_file = new File("/storage/emulated/0/Account operations(SQLite version)/export.im");
                         if (import_db_file.exists()) {
                             import_db();
                         } else {
@@ -86,12 +93,12 @@ public class AccountOperations extends AppCompatActivity {
 
     private void export_db(String data) {
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput("database.im", Context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput("android_export.im", Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
 
             copyFile(new File(getApplicationContext().getFilesDir().getPath()), new File("/storage/emulated/0/Account operations(SQLite version)"));
-            Toast.makeText(getApplicationContext(), "Database exported to: /storage/emulated/0/Account operations(SQLite version) directory.", LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Database exported to: /storage/emulated/0/Account operations(SQLite version)", LENGTH_LONG).show();
         } catch (IOException e) {
             Log.e("Exception", "File write failed: " + e.toString());
             Toast.makeText(getApplicationContext(), "", LENGTH_LONG).show();
@@ -118,7 +125,7 @@ public class AccountOperations extends AppCompatActivity {
 
 
     private void import_data() {
-        File file = new File(getApplicationContext().getFilesDir().getPath(), "database.im");
+        File file = new File(getApplicationContext().getFilesDir().getPath(), "export.im");
         StringBuilder text = new StringBuilder();
 
         try {
@@ -144,6 +151,7 @@ public class AccountOperations extends AppCompatActivity {
         catch (Exception e) {
             // We'll need to add proper error handling here
             Log.wtf("EXCEPTION: ", e.toString());
+            Toast.makeText(getApplicationContext(), "Database not updated. ERROR: " + e.toString(), LENGTH_LONG).show();
         }
     }
 
@@ -184,7 +192,7 @@ public class AccountOperations extends AppCompatActivity {
         String tableName = "users"; //Set name of your table
 
         SQLiteDatabase myDataBase = SQLiteDatabase.openDatabase(dbPath, null, SQLiteDatabase.OPEN_READONLY);
-        String searchQuery = "SELECT _username, _password, _name, _surname, _graduated_from, _graduated_in, _born_place, _birthday FROM " + tableName;
+        String searchQuery = "SELECT _id, _username, _password, _name, _surname, _graduated_from, _graduated_in, _born_place, _birthday FROM " + tableName;
         Cursor cursor = myDataBase.rawQuery(searchQuery, null);
 
         JSONArray resultSet = new JSONArray();

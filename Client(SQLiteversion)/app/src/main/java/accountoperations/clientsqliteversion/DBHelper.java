@@ -82,7 +82,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public boolean onUpdate(String json) {
         // parse json string
         try {
-            ArrayList<Integer> _id = new ArrayList<>();
+            ArrayList<Long> _id = new ArrayList<>();
             ArrayList<String> _username = new ArrayList<>();
             ArrayList<String> _password = new ArrayList<>();
             ArrayList<String> _name = new ArrayList<>();
@@ -94,7 +94,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
             JSONArray ja = new JSONArray(json);
             for(int i = 0; i < ja.length(); i++) {
-                _id.add(ja.getJSONObject(i).getInt("_id"));
+                _id.add(ja.getJSONObject(i).getLong("_id"));
                 _username.add(ja.getJSONObject(i).getString("_username"));
                 _password.add(ja.getJSONObject(i).getString("_password"));
                 _name.add(ja.getJSONObject(i).getString("_name"));
@@ -107,25 +107,39 @@ public class DBHelper extends SQLiteOpenHelper {
 
             // testing if ArrayLists has filled w/ data or not
 //            for (int i = 0; i < _id.size(); i++) {
-//                Log.v("_id", String.valueOf(_id.get(i)) + "\n");
-//                Log.v("_username", _username.get(i) + "\n");
-//                Log.v("_password", _password.get(i) + "\n");
-//                Log.v("_name", _name.get(i) + "\n");
-//                Log.v("_surname", _surname.get(i) + "\n");
-//                Log.v("_graduated_from", _graduated_from.get(i) + "\n");
-//                Log.v("_graduated_in", _graduated_in.get(i) + "\n");
-//                Log.v("_born_place", _born_place.get(i) + "\n");
-//                Log.v("_birthday", _birthday.get(i) + "\n\n\n\nNext one\n");
+//                Log.v("_id", String.valueOf(_id.get(i)) + "\n\n\n");
+//                Log.v("_username", _username.get(i) + "\n\n\n");
+//                Log.v("_password", _password.get(i) + "\n\n\n");
+//                Log.v("_name", _name.get(i) + "\n\n\n");
+//                Log.v("_surname", _surname.get(i) + "\n\n\n");
+//                Log.v("_graduated_from", _graduated_from.get(i) + "\n\n\n");
+//                Log.v("_graduated_in", _graduated_in.get(i) + "\n\n\n");
+//                Log.v("_born_place", _born_place.get(i) + "\n\n\n");
+//                Log.v("_birthday", _birthday.get(i) + "\n\n\n\nNext one\n\n\n");
 //            }
 
             SQLiteDatabase db = this.getReadableDatabase();
             db.execSQL("DELETE FROM " + TABLE_USERS);
 
-
+            for (int i = 0; i < _id.size(); i++) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(COLUMN_ID, _id.get(i));
+                contentValues.put(COLUMN_USERNAME, _username.get(i));
+                contentValues.put(COLUMN_PASSWORD, _password.get(i));
+                contentValues.put(COLUMN_NAME, _name.get(i));
+                contentValues.put(COLUMN_SURNAME, _surname.get(i));
+                contentValues.put(COLUMN_GRADUATED_FROM, _graduated_from.get(i));
+                contentValues.put(COLUMN_GRADUATED_IN, _graduated_in.get(i));
+                contentValues.put(COLUMN_BORN_PLACE, _born_place.get(i));
+                contentValues.put(COLUMN_BIRTHDAY, _birthday.get(i));
+                db.insert(TABLE_USERS, null, contentValues);
+            }
 
             return true;
         } catch (Exception e) {
             Log.wtf("json error", e.toString());
+            AccountOperations ac = new AccountOperations();
+            Toast.makeText(ac.getApplicationContext(), e.toString(), Toast.LENGTH_LONG).show();
             return false;
         }
 

@@ -22,7 +22,7 @@
         </activity>
         <activity
             android:name=".User"
-            android:label="@string/title_activity_display_user"
+            android:label="@string/title_activity_registration"
             android:parentActivityName=".AccountOperations">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
