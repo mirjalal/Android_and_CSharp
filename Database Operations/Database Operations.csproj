@@ -48,7 +48,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>2_032.ico</ApplicationIcon>
+    <ApplicationIcon>Converted_file_47143939.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MySql.Data, Version=6.9.5.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
@@ -106,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="2_032.ico" />
+    <Content Include="Converted_file_47143939.ico" />
     <Content Include="Database %281%29.ico" />
   </ItemGroup>
   <ItemGroup>
